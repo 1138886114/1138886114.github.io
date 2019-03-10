@@ -6,15 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives | Hexo</title>
+  <title>Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
+  <meta name="description" content="[TOC] 一、准备1.1 开始准备开发运行环境 win10 | Anaconda | python=3.6 | pytorch=1.0关于系统运行环境的安装请点击，PyTorch虚拟环境请点击项目下载地址：https://github.com/chenyuntc/simple-faster-rcnn-pytorch预训练模型地址：https://pan.baidu.com/s/1o87RuXW">
+<meta property="og:type" content="article">
 <meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/index.html">
+<meta property="og:url" content="http://yoursite.com/2019/03/08/PyTorch faster_rcnn之一代码复现/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="[TOC] 一、准备1.1 开始准备开发运行环境 win10 | Anaconda | python=3.6 | pytorch=1.0关于系统运行环境的安装请点击，PyTorch虚拟环境请点击项目下载地址：https://github.com/chenyuntc/simple-faster-rcnn-pytorch预训练模型地址：https://pan.baidu.com/s/1o87RuXW">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-03-08T05:45:07.224Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo">
+<meta name="twitter:description" content="[TOC] 一、准备1.1 开始准备开发运行环境 win10 | Anaconda | python=3.6 | pytorch=1.0关于系统运行环境的安装请点击，PyTorch虚拟环境请点击项目下载地址：https://github.com/chenyuntc/simple-faster-rcnn-pytorch预训练模型地址：https://pan.baidu.com/s/1o87RuXW">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -150,139 +154,179 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-PyTorch faster_rcnn之一代码复现" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>[TOC]</p>
+<h3 id="一、准备"><a href="#一、准备" class="headerlink" title="一、准备"></a>一、准备</h3><h5 id="1-1-开始准备"><a href="#1-1-开始准备" class="headerlink" title="1.1 开始准备"></a>1.1 开始准备</h5><p>开发运行环境 <strong><code>win10 | Anaconda | python=3.6 | pytorch=1.0</code></strong><br>关于系统运行环境的安装请点击，PyTorch虚拟环境请点击<br>项目下载地址：<a href="https://github.com/chenyuntc/simple-faster-rcnn-pytorch" target="_blank" rel="noopener">https://github.com/chenyuntc/simple-faster-rcnn-pytorch</a><br>预训练模型地址：<a href="https://pan.baidu.com/s/1o87RuXW" target="_blank" rel="noopener">https://pan.baidu.com/s/1o87RuXW</a>  提取码：scxn</p>
+<p>安装以下依赖包<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">conda install pip pyyaml sympy h5py cython numpy scipy</span><br><span class="line">conda install -c menpo opencv3  <span class="comment"># 或者：pip install opencv-python</span></span><br><span class="line">pip install easydict</span><br><span class="line">pip install cupy-cuda80</span><br><span class="line">pip install -r requirements.txt <span class="comment">#其他的依赖</span></span><br></pre></td></tr></table></figure></p>
+<h5 id="1-2-准备训练数据-Pascal-VOC2007-与模型权重"><a href="#1-2-准备训练数据-Pascal-VOC2007-与模型权重" class="headerlink" title="1.2 准备训练数据 Pascal VOC2007 与模型权重"></a>1.2 准备训练数据 Pascal VOC2007 与模型权重</h5><p>下载训练，验证，测试数据和VOCdevkit<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wget http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtrainval_06-Nov-2007.tar</span><br><span class="line">wget http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtest_06-Nov-2007.tar</span><br><span class="line">wget http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCdevkit_08-Jun-2007.tar</span><br><span class="line"></span><br><span class="line">将所有这些tars解压缩到一个名为的目录中 VOCdevkit中数据结构如下：</span><br><span class="line"></span><br><span class="line">$ VOCdevkit /                            ＃开发套件</span><br><span class="line">$ VOCdevkit / VOCcode /                    ＃ VOC实用代码</span><br><span class="line">$ VOCdevkit / VOC2007                     ＃图像集，注释等</span><br><span class="line">＃ ...等几个目录...</span><br></pre></td></tr></table></figure></p>
+<p>修改voc_data_dircfg项目utils/config.py，或使用参数类似将其传递给程序–voc-data-<code>dir=/path/to/VOCdevkit/VOC2007/。</code></p>
+<h5 id="1-3-准备模型权重：caffe-pretrained-vgg16"><a href="#1-3-准备模型权重：caffe-pretrained-vgg16" class="headerlink" title="1.3 准备模型权重：caffe-pretrained vgg16"></a>1.3 准备模型权重：caffe-pretrained vgg16</h5><p>如果您想使用caffe-pretrain模型作为初始重量，您可以在下面运行以获得从caffe转换的vgg16权重，这与原始论文使用的相同。<br><code>python misc / convert_caffe_pretrain.py</code><br>此脚本将下载预训练模型并将其转换为与torchvision兼容的格式。<br>下载预训练模型地址：<a href="https://pan.baidu.com/s/1DFxRkVBRjbDBDKKXdND47A" target="_blank" rel="noopener">https://pan.baidu.com/s/1DFxRkVBRjbDBDKKXdND47A</a> 密码：u0xf。<br>然后，您可以通过设置指定vgg16_caffe.pth存储的caffe-pretraind模型的位置。默认路径没问题。<code>utils/config.pycaffe_pretrain_path</code><br>如果您想使用来自torchvision的预训练模型，您可以跳过此步骤。</p>
+<p>注意，caffe预训练模型表现出略微更好的表现。<br>注意：caffe模型需要BGR 0-255中的图像，而torchvision模型需要RGB和0-1中的图像。有关data/dataset.py详细信息</p>
+<h5 id="1-4-训练前"><a href="#1-4-训练前" class="headerlink" title="1.4 训练前"></a>1.4 训练前</h5><p>构建cython代码<code>nms_gpu_post</code>:<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 由于我是win10系统，编译时报错了（请查看报错与问题解决）</span></span><br><span class="line">cd model/utils/nms/</span><br><span class="line">python build.py build_ext --inplace</span><br></pre></td></tr></table></figure></p>
+<p>启动视觉可视化（确保之前的visdom能正常使用）<br><code>python -m visdom.server</code></p>
+<h3 id="二、开始训练"><a href="#二、开始训练" class="headerlink" title="二、开始训练"></a>二、开始训练</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir checkpoints / ＃创建文件夹（用于存放训练权重）</span><br><span class="line">python train.py train --env = &apos; fasterrcnn-caffe &apos;-- plot-every = 100 --caffe-pretrain</span><br></pre></td></tr></table></figure>
+<h3 id="三、推论或预测"><a href="#三、推论或预测" class="headerlink" title="三、推论或预测"></a>三、推论或预测</h3><h3 id="四、报错与解决"><a href="#四、报错与解决" class="headerlink" title="四、报错与解决"></a>四、报错与解决</h3><p>报错一：python build.py build_ext –inplace<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">C:\Anaconda3\envs\AI_PyTorch_GPU\lib\site-packages\Cython\Compiler\Main.py:<span class="number">367</span>: FutureWarning: Cython directive <span class="string">'language_level'</span> <span class="keyword">not</span> set, using <span class="number">2</span> <span class="keyword">for</span> now (Py2). This will change <span class="keyword">in</span> a later release! File: E:\pytorch_project\simple-faster-rcnn-pytorch\model\utils\nms\_nms_gpu_post.pyx</span><br><span class="line">  tree = Parsing.p_module(s, pxd, full_module_name)</span><br><span class="line">building <span class="string">'_nms_gpu_post'</span> extension</span><br><span class="line">creating build</span><br><span class="line">creating build\temp.win-amd64<span class="number">-3.6</span></span><br><span class="line">creating build\temp.win-amd64<span class="number">-3.6</span>\Release</span><br><span class="line">C:\Program Files (x86)\Microsoft Visual Studio <span class="number">14.0</span>\VC\BIN\x86_amd64\cl.exe /c /nologo /Ox /W3 /GL /DNDEBUG /MD -IC:\Anaconda3\envs\AI_PyTorch_GPU\include -IC:\Anaconda3\envs\AI_PyTorch_GPU\include <span class="string">"-IC:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\INCLUDE"</span> <span class="string">"-IC:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\ATLMFC\INCLUDE"</span> <span class="string">"-IC:\Program Files (x86)\Windows Kits\10\include\10.0.10240.0\ucrt"</span> <span class="string">"-IC:\Program Files (x86)\Windows Kits\NETFXSDK\4.6\include\um"</span> <span class="string">"-IC:\Program Files (x86)\Windows Kits\8.1\include\\shared"</span> <span class="string">"-IC:\Program Files (x86)\Windows Kits\8.1\include\\um"</span> <span class="string">"-IC:\Program Files (x86)\Windows Kits\8.1\include\\winrt"</span> /Tc_nms_gpu_post.c /Fobuild\temp.win-amd64<span class="number">-3.6</span>\Release\_nms_gpu_post.obj</span><br><span class="line">_nms_gpu_post.c</span><br><span class="line">_nms_gpu_post.c(<span class="number">613</span>): fatal error C1083: 无法打开包括文件: “numpy/arrayobject.h”: No such file <span class="keyword">or</span> directory</span><br><span class="line">error: command <span class="string">'C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\BIN\\x86_amd64\\cl.exe'</span> failed <span class="keyword">with</span> exit status <span class="number">2</span></span><br></pre></td></tr></table></figure></p>
+<p>解决方法：修改<code>\model\utils\nms\build.py</code>后代码如下：<br><figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> distutils.core <span class="keyword">import</span> setup</span><br><span class="line"><span class="keyword">from</span> distutils.extension <span class="keyword">import</span> Extension</span><br><span class="line"><span class="keyword">from</span> Cython.Distutils <span class="keyword">import</span> build_ext</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"> </span><br><span class="line">setup(</span><br><span class="line">    cmdclass=&#123;<span class="string">'build_ext'</span>: build_ext&#125;,</span><br><span class="line">    ext_modules=[Extension(<span class="string">'calculate'</span>, [<span class="string">'cythonfnS.pyx'</span>])],</span><br><span class="line">    include_dirs=[np.get_include()])</span><br></pre></td></tr></table></figure></p>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/assert/img/weixin.jpg">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/08/PyTorch faster_rcnn之一源码解读/" class="archive-article-date">
-  	<time datetime="2019-03-08T06:22:42.531Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-08</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/03/08/PyTorch faster_rcnn之一代码复现/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/08/PyTorch faster_rcnn之一代码复现/" class="archive-article-date">
-  	<time datetime="2019-03-08T03:24:57.792Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-08</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/07/目录三-CSDN博客汇总/" class="archive-article-date">
-  	<time datetime="2019-03-07T09:23:37.204Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-07</time>
-</a>
-        </div>
-    	 
-        <div class="article-info info-on-right">
-          
-          
+<nav id="article-nav">
+  
+    <a href="/2019/03/08/PyTorch faster_rcnn之一源码解读/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/03/07/目录三-CSDN博客汇总/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
 
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/07/目录二-CSDN博客汇总/" class="archive-article-date">
-  	<time datetime="2019-03-07T06:22:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-07</time>
-</a>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、准备"><span class="toc-number">1.</span> <span class="toc-text">一、准备</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-1-开始准备"><span class="toc-number">1.0.1.</span> <span class="toc-text">1.1 开始准备</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-2-准备训练数据-Pascal-VOC2007-与模型权重"><span class="toc-number">1.0.2.</span> <span class="toc-text">1.2 准备训练数据 Pascal VOC2007 与模型权重</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-3-准备模型权重：caffe-pretrained-vgg16"><span class="toc-number">1.0.3.</span> <span class="toc-text">1.3 准备模型权重：caffe-pretrained vgg16</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-4-训练前"><span class="toc-number">1.0.4.</span> <span class="toc-text">1.4 训练前</span></a></li></ol></li></ol><li class="toc-item toc-level-3"><a class="toc-link" href="#二、开始训练"><span class="toc-number">2.</span> <span class="toc-text">二、开始训练</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、推论或预测"><span class="toc-number">3.</span> <span class="toc-text">三、推论或预测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、报错与解决"><span class="toc-number">4.</span> <span class="toc-text">四、报错与解决</span></a></li>
+                    </div>
+                </span>
+            </div>
         </div>
-    	 
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/03/07/目录二-CSDN博客汇总/">目录二--CSDN博客汇总</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/03/07/目录一-CSDN博客汇总/" class="archive-article-date">
-  	<time datetime="2019-03-07T06:22:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-03-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/03/07/目录一-CSDN博客汇总/">目录一--CSDN博客汇总</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
 
 
           </div>
@@ -305,8 +349,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
