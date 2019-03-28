@@ -17,9 +17,10 @@
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/1055519-20180504201307867-2009411130.png">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/maodian2.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/105552.png">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/捕获.JPG">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/捕获2.JPG">
-<meta property="og:updated_time" content="2019-03-28T05:57:29.763Z">
+<meta property="og:updated_time" content="2019-03-28T06:31:04.017Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PyTorch faster_rcnn之一源码解读二model_util">
 <meta name="twitter:description" content="整个model/util文件夹下主要将了三个Creator函数：  AnchorTargetCreator() : 用每张图中bbox的真实标签为所有任务分配ground truth！【RPN网络】 ProposalCreator() : 输入上一张图的所有bbox,label的ground trurh。输出的2000个roi作为ProposalTargetCreator的输入【RPN网络】 Pr">
@@ -291,7 +292,13 @@
 <p>输出：size为（20000，1）的正负label（其中只有128个为1，128个为0，其余都为-1）、 size为（20000，4）的回归目标（所有anchor的坐标都有）</p>
 <hr>
 <h5><span id="class-proposaltargetcreatorobject"><code>class ProposalTargetCreator(object):</code></span></h5><ul>
-<li><strong>作用</strong>：将(ground truth)地面实况 bounding boxes 分配给给定的ROI。</li>
+<li><p><strong>作用</strong>：将(ground truth)地面实况 bounding boxes 分配给给定的ROI。</p>
+</li>
+<li><p>详情：<strong>ProposalCreator</strong> 输出的2000个roi作为<strong>ProposalTargetCreator</strong>的输入，同时输入的还有一张图上的所有bbox、label的ground trurh。如果此输入图像里有5个object，那么就有5个bbox和5个label。</p>
+<p>首先将2000个roi和5个bbox给concatenate了一下成为新的roi（2005，4）；</p>
+<p>然后记录每行的最大值、最大值索引，即这2005个roi和5个bbox里某个roi最大，那么这个roi就属于某个label。</p>
+<p>下面就是选128个roi，记录下其中的索引，前32个为正类，后96个为负类。然后利用这128个索引值keep_index就得到了128个sample roi，128个gt_label，将sample_roi和其所属bbox经函数<strong>bbox2loc</strong>就得到了128个<strong>gt_loc</strong>。</p>
+</li>
 </ul>
 <p>初始化参数:</p>
 <ul>
@@ -303,8 +310,9 @@
 </ul>
 <p>返回值 (array, array, array)：</p>
 <ul>
-<li><code>sample_roi</code>：采样的rois。数据shape=(S, 4)<br><code>gt_roi_loc</code>：将采样的ROI与图面真值边界框匹配的<strong>偏移和缩放</strong>。数据shape=(S, 4)<br><code>gt_roi_label</code>：分配给采样ROI的标签. 数据shape=(S,) 范围[0, L]，值为0的标签是背景</li>
+<li><code>sample_roi</code>：采样的rois。数据shape=(S, 4);S=128<br><code>gt_roi_loc</code>：将采样的ROI与图面真值边界框匹配的<strong>偏移和缩放</strong>。数据shape=(S, 4);S=128<br><code>gt_roi_label</code>：分配给采样ROI的标签. 数据shape=(S,) 范围[0, L]，值为0的标签是背景;S=128</li>
 </ul>
+<p><img src="/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/105552.png" alt="105552"></p>
 <hr>
 <h5><span id="class-proposalcreator"><code>class ProposalCreator</code>:</span></h5><p>输入参数：</p>
 <ul>
