@@ -16,10 +16,10 @@
 <meta property="og:description" content="整个model/util文件夹下主要将了三个Creator函数：  AnchorTargetCreator() : 用每张图中bbox的真实标签为所有任务分配ground truth！【RPN网络】 ProposalCreator() : 输入上一张图的所有bbox,label的ground trurh。输出的2000个roi作为ProposalTargetCreator的输入【RPN网络】 Pr">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/1055519-20180504201307867-2009411130.png">
-<meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/D:/Program%20Files/hexo/source/_posts/PyTorch-faster-rcnn之一源码解读二model-util/maodian2.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/maodian2.png">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/捕获.JPG">
 <meta property="og:image" content="http://yoursite.com/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/捕获2.JPG">
-<meta property="og:updated_time" content="2019-03-28T05:46:38.881Z">
+<meta property="og:updated_time" content="2019-03-28T05:57:29.763Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="PyTorch faster_rcnn之一源码解读二model_util">
 <meta name="twitter:description" content="整个model/util文件夹下主要将了三个Creator函数：  AnchorTargetCreator() : 用每张图中bbox的真实标签为所有任务分配ground truth！【RPN网络】 ProposalCreator() : 输入上一张图的所有bbox,label的ground trurh。输出的2000个roi作为ProposalTargetCreator的输入【RPN网络】 Pr">
@@ -265,8 +265,8 @@
 <li>传入参数<br>base_size=16 ： 参考窗口的宽度和高度<br>ratios=[0.5, 1, 2] ： 锚的宽高比（可以有多个比率）：宽度与高度的比率<br>anchor_scales=[8, 16, 32]：锚定区域：anchor_scales中元素的平方与参考窗口的原始区域的乘积。</li>
 <li>返回值<br>numpy.ndarray：数据shape=(R, 4)<br>每个元素都是一组 bounding box(边界框)的坐标，对应 $y_{min}, x_{min}, y_{max}, x_{max}$</li>
 </ul>
-<p><img src="/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/D:/Program Files\hexo\source\_posts\PyTorch-faster-rcnn之一源码解读二model-util\maodian2.png" alt="maodian2"><br>该函数返回值为anchor_base，形状9*4，9个anchor的左下右上坐标：</p>
-<p>-37.2548,-82.5097 53.2548,98.5097<br>-82.5097,-173.019    98.5097,189.019<br>-173.019,-354.039    189.019,370.039<br>-56,-56    72,72<br>-120,-120    136,136<br>-248,-248    264,264<br>-82.5097,-37.2548    98.5097,53.2548<br>-173.019,-82.5097    189.019,98.5097<br>-354.039,-173.019    370.039,189.019</p>
+<p><img src="/2019/03/22/PyTorch-faster-rcnn之一源码解读二model-util/maodian2.png" alt="maodian2"><br>该函数返回值为anchor_base，形状9*4，9个anchor的左下右上坐标：</p>
+<p>(-37.2548,-82.5097)    (53.2548,98.5097)<br>(-82.5097,-173.019)    (98.5097,189.019)<br>(-173.019,-354.039)    (189.019,370.039)<br>(-56,-56)    (72,72)<br>(-120,-120)    (136,136)<br>(-248,-248)    (264,264)<br>(-82.5097,-37.2548)    (98.5097,53.2548)<br>(-173.019,-82.5097)    (189.019,98.5097)<br>(-354.039,-173.019)    (370.039,189.019)</p>
 <hr>
 <h4><span id="modelutilscreator_toolpy文件"><table><tr><td bgcolor="#1C86EE"><font color="#FFFFFF"><b>model/utils/creator_tool.py文件</b></font></td></tr></table></span></h4><h5><span id="class-anchortargetcreatorobject"><code>class AnchorTargetCreator(object)</code>:</span></h5><ul>
 <li><strong>作用</strong>： 将图像事实 bounding boxes 指定给anchors用于训练RPN。</li>
